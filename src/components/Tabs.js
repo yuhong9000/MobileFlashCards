@@ -1,0 +1,59 @@
+import React from 'react'
+import {
+  View, Text,
+} from 'react-native'
+import { FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { createBottomTabNavigator } from 'react-navigation'
+import DeckStack from './DeckStack'
+import NewDeckStack from './NewDeckStack'
+
+const Settings = () => (
+  <View>
+    <Text>Settings</Text>
+  </View>
+)
+
+const Tabs = createBottomTabNavigator({
+  Home: {
+    screen: DeckStack,
+    navigationOptions: {
+      tabBarLabel: 'Home',
+      tabBarIcon: ({ tintColor }) => <Ionicons name='ios-bookmarks' size={30} color={tintColor} />
+    },
+  },
+  NewDeck: {
+    screen: NewDeckStack,
+    navigationOptions: {
+      tabBarLabel: 'New Deck',
+      tabBarIcon: ({ tintColor }) => <FontAwesome name='plus-square' size={30} color={tintColor} />
+    },
+  },
+  // Settings: {
+  //   screen: Settings,
+  //   navigationOptions: {
+  //     tabBarLabel: 'Settings',
+  //     tabBarIcon: ({ tintColor }) => <MaterialIcons name='settings' size={30} color={tintColor} />
+  //   },
+  // }
+}, {
+  navigationOptions: {
+    header: null
+  },
+  tabBarOptions: {
+    activeTintColor: 'black',
+    style: {
+      paddingTop: 10,
+      height: 60,
+      backgroundColor: 'white',
+      shadowColor: 'rgba(0, 0, 0, 0.24)',
+      shadowOffset: {
+        width: 0,
+        height: 3
+      },
+      shadowRadius: 6,
+      shadowOpacity: 1
+    }
+  }
+})
+
+export default Tabs;
