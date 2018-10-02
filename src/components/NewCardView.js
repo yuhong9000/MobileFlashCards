@@ -2,7 +2,7 @@ import React from 'react';
 import {
   StyleSheet, Text, View,
   TextInput, KeyboardAvoidingView,
-  Button, Alert, Keyboard
+  Button, Alert
 } from 'react-native';
 import { connect } from 'react-redux'
 import { updateNewCard } from '../actions/cards'
@@ -10,7 +10,8 @@ import SubmitBtn from './UI/SubmitBtn'
 import CustomTextArea from './UI/CustomTextArea'
 
 class NewCardView extends React.Component{
-  static height = '100%'
+
+  static height = '100%'; // Height of second text input, avoids Keyboard
 
   static navigationOptions = ({navigation}) => {
     // prevents warning: button must have defined onPress
@@ -37,7 +38,8 @@ class NewCardView extends React.Component{
   }
 
   componentDidMount() {
-      this.props.navigation.setParams({ ToDeckView: this.ToDeckView });
+    // Allows react-navigation to use class methods
+    this.props.navigation.setParams({ ToDeckView: this.ToDeckView });
   }
 
   ToDeckView = () => {
@@ -76,54 +78,39 @@ class NewCardView extends React.Component{
     })
   }
 
-  componentDidMount () {
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
-    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
-  }
-
-  componentWillUnmount () {
-    this.keyboardDidShowListener.remove();
-    this.keyboardDidHideListener.remove();
-  }
-
-  _keyboardDidShow () {
-    NewCardView.height = '80%';
-  }
-
-  _keyboardDidHide () {
-    NewCardView.height = '100%';
-  }
-
   render(){
     const { navigation } = this.props;
     const { question, answer, height } = this.state;
-    // const { deck_id} = navigation.state.params;
 
     return (
       <KeyboardAvoidingView behavior='padding' style={styles.container} enable>
-          <CustomTextArea
-            placeholder='Front'
-            value={question}
-            style={styles.input}
-            onChangeText={this.handleQuestionChange}
-            autoCapitalize='none'
-            maxLength={100}
-            autoFocus
-            />
-          <CustomTextArea
-            placeholder='Back'
-            value={answer}
-            style={[styles.input,{flexGrow:1,height:NewCardView.height}]}
-            onChangeText={this.handleAnswerChange}
-            autoCapitalize='sentences'
-            multiline={true}
-            />
+          <View style={[styles.input,{borderBottomWidth:0}]}>
+            <CustomTextArea
+              placeholder='Front'
+              value={question}
+              style={styles.text}
+              onChangeText={this.handleQuestionChange}
+              autoCapitalize='none'
+              maxLength={100}
+              autoFocus
+              />
+          </View>
+          <View style={[styles.input,{flex:1,height:'100%'}]}>
+            <CustomTextArea
+              placeholder='Back'
+              value={answer}
+              style={[styles.text]}
+              onChangeText={this.handleAnswerChange}
+              autoCapitalize='sentences'
+              multiline={true}
+              />
+          </View>
+
+
       </KeyboardAvoidingView>
     )
   }
-
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -132,16 +119,17 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   input: {
-    borderWidth: 1,
+    borderWidth: 1.5,
     backgroundColor: '#fff',
     width: '100%',
+  },
+  text: {
     fontSize: 25,
     paddingLeft: 20,
     paddingRight: 20,
     paddingTop: 10,
     paddingBottom: 10,
-
-  },
+  }
 });
 
 export default connect()(NewCardView);
