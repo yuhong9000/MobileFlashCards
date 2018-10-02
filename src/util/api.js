@@ -75,12 +75,6 @@ export function addCardToDeck(title,card){
 }
 
 export function getInitialData(){
-  console.log('getting decks')
   return getDecks()
-    .then((result) => {
-      console.log(JSON.parse(result))
-      return JSON.parse(result)
-    },(e) => {
-      console.log('Error is ', e)
-    })
+    .then((result) => (JSON.parse(result)))
 }
