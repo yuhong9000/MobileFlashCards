@@ -1,18 +1,33 @@
 import React from 'react';
 import {
   StyleSheet, Text, View,
-  TextInput, KeyboardAvoidingView
+  TextInput, KeyboardAvoidingView,
+  Button, Alert, Keyboard
 } from 'react-native';
+import { connect } from 'react-redux'
+import { updateNewCard } from '../actions/cards'
 import SubmitBtn from './UI/SubmitBtn'
 import CustomTextArea from './UI/CustomTextArea'
 
 class NewCardView extends React.Component{
+  static height = '100%'
+
   static navigationOptions = ({navigation}) => {
+    // prevents warning: button must have defined onPress
+    // navigation.getParm is a pattern for static navOpt to interact with class
+    const handleButtonPress = navigation.getParam('ToDeckView')?
+      navigation.getParam('ToDeckView'):() => {}
+
     return {
       title: 'New Card',
       headerTitleStyle: {
         fontSize: 30,
-      }
+      },
+      headerRight:(
+      <Button
+        onPress={handleButtonPress}
+        title="Done"
+        />)
     }
   }
 
@@ -21,15 +36,32 @@ class NewCardView extends React.Component{
     answer: '',
   }
 
+  componentDidMount() {
+      this.props.navigation.setParams({ ToDeckView: this.ToDeckView });
+  }
+
   ToDeckView = () => {
-    // update redux and database
-
-    const { navigation } = this.props;
+    const { navigation, dispatch } = this.props;
+    const { title } = navigation.state.params;
     const { navigate } = navigation;
+    const { question, answer } = this.state;
 
-    navigate(
-      'DeckView',
-    )
+    // validate input
+    if(question === '' || answer === ''){
+      Alert.alert(
+        'Error',
+        'Cannot have empty fields',
+      )
+    }
+    else{
+      // update redux and database
+      dispatch(updateNewCard(title, {question, answer}));
+
+      navigate(
+        'DeckView',
+        { title }
+      )
+    }
   }
 
   handleQuestionChange = (question) => {
@@ -44,26 +76,48 @@ class NewCardView extends React.Component{
     })
   }
 
+  componentDidMount () {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
+  }
+
+  componentWillUnmount () {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+  }
+
+  _keyboardDidShow () {
+    NewCardView.height = '80%';
+  }
+
+  _keyboardDidHide () {
+    NewCardView.height = '100%';
+  }
+
   render(){
     const { navigation } = this.props;
-    const { question, answer } = this.state;
+    const { question, answer, height } = this.state;
     // const { deck_id} = navigation.state.params;
 
     return (
-      <KeyboardAvoidingView behavior='padding' style={styles.container}>
-        <Text style={styles.text}>Enter Questions</Text>
-        <CustomTextArea
-          value={question}
-          style={styles.input}
-          onChangeText={this.handleQuestionChange}
-          />
-        <Text style={styles.text}>Enter Answer</Text>
-        <CustomTextArea
-          value={answer}
-          style={styles.input}
-          onChangeText={this.handleAnswerChange}
-          />
-        <SubmitBtn text='Submit' onPress={this.ToDeckView}/>
+      <KeyboardAvoidingView behavior='padding' style={styles.container} enable>
+          <CustomTextArea
+            placeholder='Front'
+            value={question}
+            style={styles.input}
+            onChangeText={this.handleQuestionChange}
+            autoCapitalize='none'
+            maxLength={100}
+            autoFocus
+            />
+          <CustomTextArea
+            placeholder='Back'
+            value={answer}
+            style={[styles.input,{flexGrow:1,height:NewCardView.height}]}
+            onChangeText={this.handleAnswerChange}
+            autoCapitalize='sentences'
+            multiline={true}
+            />
       </KeyboardAvoidingView>
     )
   }
@@ -76,23 +130,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    margin: 10,
   },
   input: {
     borderWidth: 1,
-    backgroundColor: 'orange',
+    backgroundColor: '#fff',
     width: '100%',
-    height: 45,
     fontSize: 25,
-    margin: 10,
-    padding: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
     paddingTop: 10,
+    paddingBottom: 10,
 
   },
-  text: {
-    fontSize: 25,
-    margin: 10,
-  }
 });
 
-export default NewCardView;
+export default connect()(NewCardView);

@@ -1,8 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, ScrollView, View, StatusBar } from 'react-native';
+import {
+  StyleSheet, Text, ScrollView, View, StatusBar,
+  AsyncStorage
+} from 'react-native';
+import { connect } from 'react-redux'
+import { handleInitialData } from '../actions/shared'
 import DeckCard from './DeckCard'
 
 class Home extends React.Component{
+
   static navigationOptions = {
     title: 'Flash Cards',
     headerTitleStyle: {
@@ -10,17 +16,29 @@ class Home extends React.Component{
     }
   }
 
+  componentDidMount(){
+    const { dispatch } = this.props;
+    dispatch(handleInitialData());
+  }
+
   render(){
-    const { navigation } = this.props;
+    const { decks, navigation } = this.props;
+
     return(
-      <ScrollView style={{marginTop: 20}} contentContainerStyle={{alignItems: 'center'}}>
-        <DeckCard title='New Deck' count={0} navigate = {navigation.navigate}/>
-        <DeckCard title='SAT' count={0} navigate = {navigation.navigate}/>
-        <DeckCard title='GRE' count={0} navigate = {navigation.navigate}/>
+      <ScrollView contentContainerStyle={{alignItems: 'center'}}>
+        {Object.keys(decks).sort().map((i)=>(
+          <DeckCard key={i} title={decks[i].title} count={decks[i].cards.length} navigate={navigation.navigate} />
+        ))}
       </ScrollView>
     )
   }
 }
 
+function mapStateToProps ({decks}, {navigation}) {
+  return {
+    decks,
+    navigation,
+  }
+}
 
-export default Home;
+export default connect(mapStateToProps)(Home);

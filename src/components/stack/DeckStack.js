@@ -1,8 +1,10 @@
 import { createStackNavigator } from 'react-navigation'
-import DeckCard from './DeckCard'
-import DeckView from './DeckView'
-import NewCardView from './NewCardView'
-import Home from './Home'
+import DeckCard from '../DeckCard'
+import DeckView from '../DeckView'
+import NewCardView from '../NewCardView'
+import ReviewCardsView from '../ReviewCardsView'
+import DefaultQuizView from '../DefaultQuizView'
+import Home from '../Home'
 
 const DeckStack = createStackNavigator({
   Home: {
@@ -16,6 +18,12 @@ const DeckStack = createStackNavigator({
   },
   NewCardView: {
     screen: NewCardView,
+  },
+  ReviewCardsView: {
+    screen: ReviewCardsView,
+  },
+  DefaultQuizView: {
+    screen: DefaultQuizView,
   }
 },{
   headerMode: 'float',

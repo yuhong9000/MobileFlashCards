@@ -1,6 +1,8 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 import { createStackNavigator } from 'react-navigation'
+import { connect } from 'react-redux'
+import { updateNewDeck } from '../actions/decks'
 import CustomTextArea from './UI/CustomTextArea'
 import SubmitBtn from './UI/SubmitBtn'
 
@@ -24,15 +26,31 @@ class NewDeckView extends React.Component {
     })
   }
 
-  ToHomeView = () => {
-    // update redux and database
+  handleSubmit = () => {
+    const { input } = this.state;
 
-    const { navigation } = this.props;
-    const { navigate } = navigation;
+    if(input === ''){
+      Alert.alert(
+        'Error',
+        'Please enter a title',
+      )
+    }
+    else{
+      // update redux and database
+      const { dispatch } = this.props;
+      dispatch(updateNewDeck(input));
 
-    navigate(
-      'Home',
-    )
+      const { navigation } = this.props;
+      const { navigate } = navigation;
+
+      this.setState({
+        input: '',
+      });
+
+      navigate(
+        'Home',
+      );
+    }
   }
 
   render(){
@@ -46,7 +64,7 @@ class NewDeckView extends React.Component {
           style={styles.input}
           onChangeText={this.handleChangeText}
           />
-        <SubmitBtn text='Submit' onPress={this.ToHomeView}/>
+        <SubmitBtn text='Submit' onPress={this.handleSubmit}/>
       </View>
     )
   }
@@ -76,18 +94,4 @@ const styles = StyleSheet.create({
   }
 });
 
-const NewDeckStack = createStackNavigator({
-  NewDeckView: {
-    screen: NewDeckView,
-  },
-},{
-  headerMode: 'float',
-  navigationOptions:{
-    headerStyle: {
-      height: 50,
-    },
-    headerBackTitle: 'back',
-  }
-})
-
-export default NewDeckStack;
+export default connect()(NewDeckView);

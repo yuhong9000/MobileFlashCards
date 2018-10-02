@@ -2,6 +2,7 @@ import React from 'react';
 import {
   StyleSheet, TouchableOpacity, Text, View , Alert
 } from 'react-native';
+import { connect } from 'react-redux'
 import SubmitBtn from './UI/SubmitBtn'
 
 class DeckView extends React.Component{
@@ -16,13 +17,42 @@ class DeckView extends React.Component{
     }
   }
 
-  ToNewCardView = () => {
-    const { navigation } = this.props;
+  handleNavigate = (destination) => {
+    const { navigation, title } = this.props;
     const { navigate } = navigation;
 
     navigate(
-      'NewCardView'
+      destination,
+      { title }
     )
+  }
+
+  ToNewCardView = () => {
+    this.handleNavigate('NewCardView');
+  }
+
+  ToReviewCardsView = () => {
+    const { count } = this.props;
+    if(count > 0){
+      this.handleNavigate('ReviewCardsView');
+    }
+    else{
+      Alert.alert(
+        'No cards in this deck'
+      )
+    }
+  }
+
+  ToDefaultQuizView = () => {
+    const { count } = this.props;
+    if(count > 0){
+      this.handleNavigate('DefaultQuizView');
+    }
+    else{
+      Alert.alert(
+        'No cards in this deck'
+      )
+    }
   }
 
   OnRemoveDeck = () => {
@@ -42,8 +72,7 @@ class DeckView extends React.Component{
   }
 
   render(){
-    const { navigation } = this.props;
-    const { title, count } = navigation.state.params;
+    const { navigation, title, count } = this.props;
 
     return (
       <View style={styles.container}>
@@ -52,7 +81,8 @@ class DeckView extends React.Component{
         </View>
         <View style={styles.bottom}>
           <SubmitBtn text='Add Cards' onPress={this.ToNewCardView}/>
-          <SubmitBtn text='Start Quiz' />
+          <SubmitBtn text='Review Cards' onPress={this.ToReviewCardsView}/>
+          <SubmitBtn text='Start Quiz' onPress={this.ToDefaultQuizView}/>
           <SubmitBtn text='Remove Deck' onPress={this.OnRemoveDeck}/>
         </View>
       </View>
@@ -85,4 +115,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DeckView;
+function mapStateToProps({decks},{navigation}){
+  const { title } = navigation.state.params;
+  return {
+    title,
+    count: decks[title].cards.length,
+    navigation,
+  }
+}
+export default connect(mapStateToProps)(DeckView);

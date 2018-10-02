@@ -8,7 +8,7 @@ class DeckCard extends Component{
 
     navigate(
       'DeckView',
-      { title, count }
+      { title }
     )
   }
 
